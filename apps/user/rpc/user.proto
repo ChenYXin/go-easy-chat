@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "./user";
+
+message UserEntity{
+  string id = 1;
+  string avatar = 2;
+  string nickname = 3;
+  string phone = 4;
+  int32 status = 5;
+  int32 sex = 6;
+}
+message Request{
+  string ping = 1;
+}
+message Response{
+  string pong = 1;
+}
+
+message LoginRequest{
+  string phone = 1;
+  int64 password = 2;
+}
+message LoginResponse{
+  string token = 1;
+  int64 expire = 2;
+}
+
+message RegisterRequest{
+  string phone = 1;
+  string nickname = 2;
+  string password = 3;
+  string avatar = 4;
+  int32 sex = 5;
+}
+message RegisterResponse{
+  string token = 1;
+  int64 expire = 2;
+}
+
+message GetUserInfoRequest{
+  string id = 1;
+}
+message GetUserInfoResponse{
+  UserEntity user = 1;
+}
+
+message FindUserRequest{
+  string name = 1;
+  string phone = 2;
+  repeated string ids = 3;
+}
+message FindUserResponse{
+  UserEntity user = 1;
+}
+
+service User{
+  rpc Ping(Request) returns (Response);
+
+  rpc Login(LoginRequest) returns (LoginResponse);
+
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+
+  rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse);
+
+  rpc FindUser(FindUserRequest) returns (FindUserResponse);
+}
+
+

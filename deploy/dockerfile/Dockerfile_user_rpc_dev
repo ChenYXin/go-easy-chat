@@ -1,0 +1,54 @@
+#Go版本
+ARG GO_VERSION=1.22.4
+FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine AS builder
+ARG TARGETOS
+ARG TARGETARCH
+
+LABEL author="donkor"
+
+ENV GOPROXY=https://goproxy.cn,direct \
+    GOOS=$TARGETOS \
+    GO111MODULE=auto \
+    GOARCH=$TARGETARCH
+#设置国内软件仓库镜像
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+
+#alpine 基础镜像中没有包含时区信息文件 所以需要安装tzdata
+RUN apk update --no-cache && apk add --no-cache tzdata
+#设置工作目录
+WORKDIR /build
+#拷贝当前所有文件到build目录
+COPY ../../ .
+#安装go项目依赖
+RUN go mod download
+
+ENTRYPOINT ["ls","-a"]
+
+#-ldflags="-s -w" -w为去掉调试信息（无法使用gdb调试），-s为去掉符号表。 -o 编译输出的名称，代替默认的包名
+RUN go build -ldflags="-s -w" -o main apps/user/rpc/user.go
+
+#为二进制文件添加可执行命令
+RUN chmod +x /build/main
+
+#FROM scratch
+FROM --platform=$TARGETPLATFORM scratch
+#设置时区
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY --from=builder /usr/share/zoneinfo/Asia/Shanghai /usr/share/zoneinfo/Asia/Shanghai
+ENV TZ Asia/Shanghai
+
+
+ARG SERVER_NAME=user
+ARG SERVER_TRYPE=rpc
+
+WORKDIR /app
+#拷贝编译后的二进制文件
+COPY --from=builder /build/main .
+#可以暴露数据卷，设置数据卷
+#VOLUME ["/app/config.yaml"]
+#也可以直接复制配置文件
+COPY ../../apps/$SERVER_NAME/$SERVER_TRYPE/etc/$SERVER_NAME.yaml /app/etc/
+#暴漏的端口
+EXPOSE 8080
+#运行程序
+ENTRYPOINT ["/app/main"]

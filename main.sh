@@ -1,0 +1,1 @@
+sh deploy/sh/user-rpc.sh
