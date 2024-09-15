@@ -1,6 +1,17 @@
 Name: user.rpc
-ListenOn: 0.0.0.0:8080
+ListenOn: 0.0.0.0:10000
 Etcd:
   Hosts:
   - 192.168.1.101:2379
   Key: user.rpc
+Mysql:
+  DataSource: root:a12Cd3_45pUq6@tcp(127.0.0.1:3306)/easy-chat?charset=utf8mb4
+
+Cache:
+  - Host: 192.168.1.101:6379
+    Type: node
+    Pss:
+
+Jwt:
+  AccessSecret: Donkor.Easy.Chat
+  AccessExpire: 8640000

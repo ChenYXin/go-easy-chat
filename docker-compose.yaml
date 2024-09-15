@@ -10,7 +10,7 @@ services:
     environment:
       - ETCD_ENABLE_V2=true
       - ALLOW_NONE_AUTHENTICATION=yes
-      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://192.168.1.101:2379
       - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
       - ETCD_NAME=etcd
     volumes:
@@ -33,21 +33,28 @@ services:
     restart: always
     networks:
       easy-chat:
-    command: redis-server --requirepass easy-chat --appendonly yes
+    command: redis-server /usr/local/redis/config/redis.conf
 
-  mysql:
-    image: mysql:8.3.0
-    ports:
-      - "3306:3306"
-    container_name: mysql
-    volumes:
-      - ./components/mysql/data:/var/lib/mysql
-      - /etcd/localtime:/etc/localtime
-    environment:
-      MYSQL_ROOT_PASSWORD: a12Cd3_45pUq6
-    restart: always
-    networks:
-      easy-chat:
+#  mysql:
+#    image: mysql:8.3.0
+#    ports:
+#      - "3306:3306"
+#    container_name: mysql
+#    volumes:
+#      - ./components/mysql/data:/var/lib/mysql
+#      - /etcd/localtime:/etc/localtime
+#    command:
+#      # 将mysql8.0默认密码策略 修改为 原先 策略 (mysql8.0对其默认策略做了更改 会导致密码无法匹配)
+#      --default-authentication-plugin=mysql_native_password
+#      --character-set-server=utf8mb4
+#      --collation-server=utf8mb4_general_ci
+#      --explicit_defaults_for_timestamp=true
+#      --lower_case_table_names=1
+#    environment:
+#      MYSQL_ROOT_PASSWORD: a12Cd3_45pUq6
+#    restart: always
+#    networks:
+#      easy-chat:
 
 networks:
   easy-chat:
