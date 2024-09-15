@@ -53,7 +53,7 @@ message FindUserRequest{
   repeated string ids = 3;
 }
 message FindUserResponse{
-  UserEntity user = 1;
+  repeated UserEntity user = 1;
 }
 
 service User{
