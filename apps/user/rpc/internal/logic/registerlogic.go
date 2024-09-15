@@ -7,12 +7,13 @@ import (
 	"easy-chat/pkg/ctxdata"
 	"easy-chat/pkg/encrypt"
 	"easy-chat/pkg/wuid"
-	"errors"
+	"easy-chat/pkg/xerr"
 	"time"
 
 	"easy-chat/apps/user/rpc/internal/svc"
 	"easy-chat/apps/user/rpc/user"
 
+	"github.com/pkg/errors"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -39,10 +40,10 @@ func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterRespon
 	//1.验证用户是否注册，根据手机号码验证
 	userEntity, err := l.svcCtx.UsersModel.FindByPhone(l.ctx, in.Phone)
 	if err != nil && !errors.Is(err, models.ErrNotFound) {
-		return nil, err
+		return nil, errors.WithStack(ErrPhoneIsRegister)
 	}
 	if userEntity != nil {
-		return nil, ErrPhoneIsRegister
+		return nil, errors.Wrapf(xerr.NewDBErr(), "find user by phone err :%v ,req %v", err, in.Phone)
 	}
 	// 定义用户数据
 	userEntity = &models.Users{
@@ -59,7 +60,7 @@ func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterRespon
 	if len(in.Password) > 0 {
 		genPassword, err := encrypt.GenPasswordHash([]byte(in.Password))
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrapf(xerr.NewInternalErr(), "encrypt gen password err :%v ", err)
 		}
 		userEntity.Password = sql.NullString{
 			String: string(genPassword),
@@ -68,14 +69,14 @@ func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterRespon
 	}
 	_, err = l.svcCtx.UsersModel.Insert(l.ctx, userEntity)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(xerr.NewDBErr(), "insert data err :%v ", err)
 	}
 
 	// 生成token
 	now := time.Now().Unix()
 	token, err := ctxdata.GetJwtToken(l.svcCtx.Config.Jwt.AccessSecret, now, l.svcCtx.Config.Jwt.AccessExpire, userEntity.Id)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(xerr.NewInternalErr(), "ctxdata gen token err :%v ", err)
 	}
 
 	return &user.RegisterResponse{

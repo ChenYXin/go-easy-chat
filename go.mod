@@ -7,7 +7,10 @@ toolchain go1.22.3
 require (
 	github.com/edwingeng/wuid v1.0.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/jinzhu/copier v0.4.0
+	github.com/pkg/errors v0.9.1
 	github.com/zeromicro/go-zero v1.7.2
+	github.com/zeromicro/x v0.0.0-20240408115609-8224c482b07e
 	golang.org/x/crypto v0.26.0
 	google.golang.org/grpc v1.66.2
 	google.golang.org/protobuf v1.34.2
@@ -39,7 +42,6 @@ require (
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0 // indirect
-	github.com/jinzhu/copier v0.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect
