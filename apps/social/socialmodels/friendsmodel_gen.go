@@ -99,8 +99,9 @@ func (m *defaultFriendsModel) FindByUidAndFid(ctx context.Context, uid string, f
 
 func (m *defaultFriendsModel) ListByUserid(ctx context.Context, userId string) ([]*Friends, error) {
 	query := fmt.Sprintf("select %s from %s where `user_id` = ? ", friendsRows, m.table)
+
 	var resp []*Friends
-	err := m.QueryRowNoCacheCtx(ctx, &resp, query, userId)
+	err := m.QueryRowsNoCacheCtx(ctx, &resp, query, userId)
 	switch err {
 	case nil:
 		return resp, nil

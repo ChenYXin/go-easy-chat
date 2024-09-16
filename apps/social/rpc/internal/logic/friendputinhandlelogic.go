@@ -5,7 +5,6 @@ import (
 	"easy-chat/apps/social/socialmodels"
 	"easy-chat/pkg/constants"
 	"easy-chat/pkg/xerr"
-	"fmt"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 
 	"easy-chat/apps/social/rpc/internal/svc"
@@ -46,32 +45,24 @@ func (l *FriendPutInHandleLogic) FriendPutInHandle(in *social.FriendPutInHandleR
 	case constants.RefuseHandlerResult:
 		return nil, errors.WithStack(ErrFriendReqBeforeRefuse)
 	}
-	fmt.Println("-----1")
 	friendReq.HandleResult.Int64 = int64(in.HandleResult)
-	fmt.Println("-----2")
 	//修改申请结果 -》 通过【建立2条好友关系记录】 -》 事务
 	err = l.svcCtx.FriendRequestsModel.Trans(l.ctx, func(ctx context.Context, session sqlx.Session) error {
-		fmt.Println("-----3")
 		if err := l.svcCtx.FriendRequestsModel.Update(l.ctx, session, friendReq); err != nil {
 
 			return errors.Wrapf(xerr.NewDBErr(), "update friend request err %v req %v", err, in.FriendReqId)
 		}
-		fmt.Println("-----4")
 		if constants.HandlerResult(in.HandleResult) != constants.PassHandlerResult {
 			return nil
 		}
-		fmt.Println("-----5")
 		friends := []*socialmodels.Friends{
 			{UserId: friendReq.UserId, FriendUid: friendReq.ReqUid},
 			{UserId: friendReq.ReqUid, FriendUid: friendReq.UserId},
 		}
-		fmt.Println("-----6")
 		_, err = l.svcCtx.FriendsModel.Inserts(l.ctx, session, friends...)
 		if err != nil {
-			fmt.Println("-----", err)
 			return errors.Wrapf(xerr.NewDBErr(), "friend insert  request err %v", err)
 		}
-		fmt.Println("-----7")
 		return nil
 	})
 	return &social.FriendPutInHandleResp{}, nil
