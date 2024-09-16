@@ -121,22 +121,27 @@ func (m *defaultFriendsModel) Insert(ctx context.Context, data *Friends) (sql.Re
 func (m *defaultFriendsModel) Inserts(ctx context.Context, session sqlx.Session, data ...*Friends) (sql.Result, error) {
 	var (
 		sql  strings.Builder
-		arga []interface{}
+		args []any
 	)
+
 	if len(data) == 0 {
 		return nil, nil
 	}
-	// insert into tablename values(数据）（数据）
-	sql.WriteString(fmt.Sprintf("insert into %s (%s) values", m.table, friendsRowsExpectAutoSet))
+
+	// insert into tablename values(数据), (数据)
+	sql.WriteString(fmt.Sprintf("insert into %s (%s) values ", m.table, friendsRowsExpectAutoSet))
+
 	for i, v := range data {
-		sql.WriteString("(?,?,?,?,?)")
-		arga = append(arga, v.UserId, v.FriendUid, v.Remark, v.AddSource, v.CreatedAt)
+		sql.WriteString("(?, ?, ?, ?)")
+		args = append(args, v.UserId, v.FriendUid, v.Remark, v.AddSource)
 		if i == len(data)-1 {
 			break
 		}
+
 		sql.WriteString(",")
 	}
-	return session.ExecCtx(ctx, sql.String(), arga...)
+
+	return session.ExecCtx(ctx, sql.String(), args...)
 }
 
 func (m *defaultFriendsModel) Update(ctx context.Context, data *Friends) error {

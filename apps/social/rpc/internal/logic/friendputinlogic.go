@@ -32,7 +32,7 @@ func (l *FriendPutInLogic) FriendPutIn(in *social.FriendPutInReq) (*social.Frien
 	//申请人是否与目标是好友关系
 	//uid , fid
 	friends, err := l.svcCtx.FriendsModel.FindByUidAndFid(l.ctx, in.UserId, in.ReqUid)
-	if err != nil && errors.Is(err, socialmodels.ErrNotFound) {
+	if err != nil && !errors.Is(err, socialmodels.ErrNotFound) {
 		return nil, errors.Wrapf(xerr.NewDBErr(), "find friends by uid and fid err %v req %v", err, in)
 	}
 	if friends != nil {
@@ -40,7 +40,7 @@ func (l *FriendPutInLogic) FriendPutIn(in *social.FriendPutInReq) (*social.Frien
 	}
 	//是否已经有过申请，申请是不成功，没有完成
 	friendReqs, err := l.svcCtx.FriendRequestsModel.FindByReqUidAndUserId(l.ctx, in.ReqUid, in.UserId)
-	if err != nil && errors.Is(err, socialmodels.ErrNotFound) {
+	if err != nil && !errors.Is(err, socialmodels.ErrNotFound) {
 		return nil, errors.Wrapf(xerr.NewDBErr(), "find friendRequest by rid and uid err %v req %v", err, in)
 	}
 	if friendReqs != nil {
