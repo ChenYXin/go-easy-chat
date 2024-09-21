@@ -3,3 +3,7 @@ ListenOn: 0.0.0.0:10090
 
 JwtAuth:
   AccessSecret: Donkor.Easy.Chat
+
+Mongo:
+  Url: "mongodb://root:easy-chat@192.168.1.101:27017"
+  Db: easy-chat

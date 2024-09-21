@@ -35,6 +35,21 @@ services:
       easy-chat:
     command: redis-server /usr/local/redis/config/redis.conf
 
+  mongo:
+    image: mongo:4.0
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: easy-chat
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./components/mongo/data:/data/db
+      - /etc/locatime:/etc/locatime
+    restart: always
+    networks:
+      easy-chat:
+
 #  mysql:
 #    image: mysql:8.3.0
 #    ports:

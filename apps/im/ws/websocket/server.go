@@ -83,6 +83,7 @@ func (s *Server) addConn(conn *Conn, req *http.Request) {
 	//验证用户是否之前登陆过
 	if c := s.userToConn[uid]; c != nil {
 		//关闭之前的连接
+		fmt.Println("验证用户是否之前登陆过")
 		c.Close()
 	}
 	s.connToUser[conn] = uid
@@ -168,6 +169,8 @@ func (s *Server) Send(msg interface{}, conns ...*Conn) error {
 
 // 根据连接对象,执行任务处理
 func (s *Server) handlerConn(conn *Conn) {
+	uids := s.GetUsers(conn)
+	conn.Uid = uids[0]
 	for {
 		// 获取请求消息
 		_, msg, err := conn.ReadMessage()
@@ -195,8 +198,12 @@ func (s *Server) handlerConn(conn *Conn) {
 			if handler, ok := s.routes[message.Method]; ok {
 				handler(s, conn, &message)
 			} else {
-				s.Send(&Message{FrameType: FrameData, Data: fmt.Sprintf("不存在执行的方法 %v 请检查", message.Method)}, conn)
 				//conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("不存在执行的方法 %v 请检查", message.Method)))
+				s.Send(&Message{
+					FrameType: FrameData,
+					Data:      fmt.Sprintf("不存在执行的方法 %v 请检查", message.Method),
+				}, conn)
+
 			}
 		}
 	}
