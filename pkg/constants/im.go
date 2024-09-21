@@ -9,6 +9,6 @@ const (
 type ChatType int
 
 const (
-	GroupChatType ChatType = iota
+	GroupChatType ChatType = iota + 1
 	SingleChatType
 )

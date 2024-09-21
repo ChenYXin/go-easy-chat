@@ -4,7 +4,7 @@ import "easy-chat/pkg/constants"
 
 type (
 	Msg struct {
-		constants.Mtype `mapstructure:"mtype"`
+		constants.Mtype `mapstructure:"mType"`
 		Content         string `mapstructure:"content"`
 	}
 	Chat struct {
