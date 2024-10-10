@@ -17,4 +17,8 @@ type Config struct {
 		Url string
 		Db  string
 	}
+	MsgChatTransfer struct {
+		Topic string
+		Addrs []string
+	}
 }

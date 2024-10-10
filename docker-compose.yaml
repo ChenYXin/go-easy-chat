@@ -11,7 +11,7 @@ services:
     environment:
       - ETCD_ENABLE_V2=true
       - ALLOW_NONE_AUTHENTICATION=yes
-      - ETCD_ADVERTISE_CLIENT_URLS=http://192.168.1.101:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://192.168.1.102:2379
       - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
       - ETCD_NAME=etcd
     volumes:
@@ -69,8 +69,8 @@ services:
       easy-chat:
 
   kafka:
-    image: 'bitnami/kafka:latest'
-    restart: always
+    image: 'bitnami/kafka:3.3.2'
+#    restart: always
     container_name: kafka
     ports:
       - "9092:9092"
@@ -78,13 +78,13 @@ services:
       TZ: Asia/Shanghai
       KAFKA_BROKER_ID: 0
       KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
-      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://192.168.1.101:9092
-      KAFKA_CFG_ZOOKEEPER_CONNECT: 192.168.1.101:2181
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://192.168.1.102:9092
+      KAFKA_CFG_ZOOKEEPER_CONNECT: 192.168.1.102:2181
       ALLOW_PLAINTEXT_LISTENER: "yes"
     volumes:
       - ./components/kafka/data:/bitnami/kafka/data
-      - ./components/kafka/config:/opt/bitnami/kafka/config
-      - ./components/kafka/config:/opt/bitnami/kafka/logs
+#      - ./components/kafka/config:/opt/bitnami/kafka/config
+      - ./components/kafka/logs:/opt/bitnami/kafka/logs
     depends_on:
       - zookeeper
     networks:

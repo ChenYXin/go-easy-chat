@@ -31,7 +31,7 @@ func NewServer(addr string, opts ...ServerOptions) *Server {
 	return &Server{
 		routes:   make(map[string]HandlerFunc),
 		addr:     addr,
-		patten:   opt.patten,
+		patten:   opt.pattern,
 		opt:      &opt,
 		upgrader: websocket.Upgrader{},
 
