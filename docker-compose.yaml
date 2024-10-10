@@ -83,7 +83,7 @@ services:
       ALLOW_PLAINTEXT_LISTENER: "yes"
     volumes:
       - ./components/kafka/data:/bitnami/kafka/data
-#      - ./components/kafka/config:/opt/bitnami/kafka/config
+#      - ./components/kafka/config:/opt/bitnami/kafka/config 打开后kafka异常，无法启动
       - ./components/kafka/logs:/opt/bitnami/kafka/logs
     depends_on:
       - zookeeper
