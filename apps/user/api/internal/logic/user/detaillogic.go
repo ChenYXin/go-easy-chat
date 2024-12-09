@@ -27,7 +27,7 @@ func NewDetailLogic(ctx context.Context, svcCtx *svc.ServiceContext) *DetailLogi
 
 func (l *DetailLogic) Detail(req *types.UserInfoReq) (resp *types.UserInfoResp, err error) {
 	uid := ctxdata.GetUId(l.ctx)
-	loginResp, err := l.svcCtx.User.GetUserInfo(l.ctx, &user.GetUserInfoRequest{
+	userInfoResp, err := l.svcCtx.User.GetUserInfo(l.ctx, &user.GetUserInfoRequest{
 		Id: uid,
 	})
 
@@ -35,7 +35,8 @@ func (l *DetailLogic) Detail(req *types.UserInfoReq) (resp *types.UserInfoResp, 
 		return nil, err
 	}
 	var res types.User
-	copier.Copy(&res, loginResp.User)
+	copier.Copy(&res, userInfoResp.User)
+
 	return &types.UserInfoResp{
 		Info: res,
 	}, nil

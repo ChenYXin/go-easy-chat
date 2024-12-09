@@ -28,6 +28,7 @@ func main() {
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)
 
+	//设置统一返回格式（失败，成功）
 	httpx.SetErrorHandlerCtx(resultx.ErrHandler(c.Name))
 	httpx.SetOkHandler(resultx.OkHandler)
 
