@@ -10,6 +10,7 @@ func OnLine(svc *svc.ServiceContext) websocket.HandlerFunc {
 		uids := srv.GetUsers()
 
 		u := srv.GetUsers(conn)
+		//根据连接对象，获取在线的人数
 		err := srv.Send(websocket.NewMessage(u[0], uids), conn)
 		srv.Info("err", err)
 	}

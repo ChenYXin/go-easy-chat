@@ -18,6 +18,7 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 
+	//设置go-zero中的一些日志和监听
 	if err := c.SetUp(); err != nil {
 		panic(err)
 	}

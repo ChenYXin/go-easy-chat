@@ -49,7 +49,6 @@ func (l *FriendPutInHandleLogic) FriendPutInHandle(in *social.FriendPutInHandleR
 	//修改申请结果 -》 通过【建立2条好友关系记录】 -》 事务
 	err = l.svcCtx.FriendRequestsModel.Trans(l.ctx, func(ctx context.Context, session sqlx.Session) error {
 		if err := l.svcCtx.FriendRequestsModel.Update(l.ctx, session, friendReq); err != nil {
-
 			return errors.Wrapf(xerr.NewDBErr(), "update friend request err %v req %v", err, in.FriendReqId)
 		}
 		if constants.HandlerResult(in.HandleResult) != constants.PassHandlerResult {

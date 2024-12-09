@@ -30,16 +30,16 @@ func (t AckType) ToString() string {
 }
 
 type Server struct {
-	sync.RWMutex
+	sync.RWMutex // connToUser、userToConn 会有高并发的问题，需要加锁，保证线程安全
 
 	opt            *serverOptions
-	authentication Authentication
+	authentication Authentication //鉴权
 
-	routes     map[string]HandlerFunc
+	routes     map[string]HandlerFunc //存储实际具体要执行的路由，key就是方法名，value就是具体的执行方法
 	addr       string
 	patten     string
-	connToUser map[*Conn]string
-	userToConn map[string]*Conn
+	connToUser map[*Conn]string //根据连接对象获取用户
+	userToConn map[string]*Conn //根据用户获取连接对象
 
 	upgrader websocket.Upgrader
 	logx.Logger
@@ -81,6 +81,7 @@ func (s *Server) ServerWs(w http.ResponseWriter, r *http.Request) {
 	//	s.Errorf("server upgrade err : %v", err)
 	//	return
 	//}
+	//连接鉴权
 	if !s.authentication.Auth(w, r) {
 		//conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("不具备访问权限")))
 		s.Send(&Message{FrameType: FrameData, Data: fmt.Sprintf("不具备访问权限")}, conn)
@@ -93,6 +94,7 @@ func (s *Server) ServerWs(w http.ResponseWriter, r *http.Request) {
 	go s.handlerConn(conn)
 }
 
+// 添加连接对象
 func (s *Server) addConn(conn *Conn, req *http.Request) {
 	uid := s.authentication.UserId(req)
 
@@ -105,16 +107,20 @@ func (s *Server) addConn(conn *Conn, req *http.Request) {
 		fmt.Println("验证用户是否之前登陆过")
 		c.Close()
 	}
+	//存在map中，key:连接对象,value:用户ID
 	s.connToUser[conn] = uid
+	//存在map中，key:用户ID,value:连接对象
 	s.userToConn[uid] = conn
 }
 
+// GetConn 根据uid获得连接对象
 func (s *Server) GetConn(uid string) *Conn {
 	s.RWMutex.RLock()
 	defer s.RWMutex.RUnlock()
 	return s.userToConn[uid]
 }
 
+// GetConns 根据多个uid获得多个连接对象
 func (s *Server) GetConns(uids ...string) []*Conn {
 	if len(uids) == 0 {
 		return nil
@@ -128,6 +134,7 @@ func (s *Server) GetConns(uids ...string) []*Conn {
 	return res
 }
 
+// GetUsers 根据连接对象获得userId
 func (s *Server) GetUsers(conns ...*Conn) []string {
 	s.RWMutex.RLock()
 	defer s.RUnlock()
@@ -149,6 +156,7 @@ func (s *Server) GetUsers(conns ...*Conn) []string {
 	return res
 }
 
+// Close 关闭连接对象
 func (s *Server) Close(conn *Conn) {
 	s.RWMutex.Lock()
 	defer s.RWMutex.Unlock()
@@ -164,12 +172,15 @@ func (s *Server) Close(conn *Conn) {
 	conn.Close()
 }
 
+// SendByUserId 根据sendIds发送消息
 func (s *Server) SendByUserId(msg interface{}, sendIds ...string) error {
 	if len(sendIds) == 0 {
 		return nil
 	}
 	return s.Send(msg, s.GetConns(sendIds...)...)
 }
+
+// Send 根据连接对象发送消息
 func (s *Server) Send(msg interface{}, conns ...*Conn) error {
 	if len(conns) == 0 {
 		return nil
@@ -179,6 +190,7 @@ func (s *Server) Send(msg interface{}, conns ...*Conn) error {
 		return err
 	}
 	for _, conn := range conns {
+		//通过websocket发送消息
 		if err = conn.WriteMessage(websocket.TextMessage, data); err != nil {
 			return err
 		}
@@ -203,7 +215,7 @@ func (s *Server) handlerConn(conn *Conn) {
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
 			s.Errorf("server read msg err : %v", err)
-			//t关闭连接对象
+			//关闭连接对象
 			s.Close(conn)
 			return
 		}
@@ -356,6 +368,7 @@ func (s *Server) handlerWrite(conn *Conn) {
 	}
 }
 
+// AddRouters 添加实际具体要执行的路由
 func (s *Server) AddRouters(rs []Route) {
 	for _, r := range rs {
 		s.routes[r.Method] = r.Handler

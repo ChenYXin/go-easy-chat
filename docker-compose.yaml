@@ -4,14 +4,14 @@ services:
   etcd:
     image: 'bitnami/etcd:3.5.12'
     container_name: etcd
-    restart: always
+#    restart: always
     ports:
       - "2379:2379"
       - "2380:2380"
     environment:
       - ETCD_ENABLE_V2=true
       - ALLOW_NONE_AUTHENTICATION=yes
-      - ETCD_ADVERTISE_CLIENT_URLS=http://192.168.1.102:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://192.168.1.103:2379
       - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
       - ETCD_NAME=etcd
     volumes:
@@ -20,22 +20,22 @@ services:
     networks:
       easy-chat:
 
-  redis:
-    image: 'redis:latest'
-    ports:
-      - "6379:6379"
-    container_name: redis
-    volumes:
-      - ./components/redis/data:/data
-      - ./components/redis/config/redis.conf:/usr/local/redis/config/redis.conf
-    environment:
-      TZ: Asia/Shanghai
-    privileged: true
-    restart: always
-    networks:
-      easy-chat:
-    command: redis-server /usr/local/redis/config/redis.conf
-
+#  redis:
+#    image: 'redis:latest'
+#    ports:
+#      - "6379:6379"
+#    container_name: redis
+#    volumes:
+#      - ./components/redis/data:/data
+#      - ./components/redis/config/redis.conf:/usr/local/redis/config/redis.conf
+#    environment:
+#      TZ: Asia/Shanghai
+#    privileged: true
+#    restart: always
+#    networks:
+#      easy-chat:
+#    command: redis-server /usr/local/redis/config/redis.conf
+#
   mongo:
     image: 'mongo:4.0'
     container_name: mongo
@@ -51,44 +51,44 @@ services:
     networks:
       easy-chat:
 
-  zookeeper:
-    image: 'bitnami/zookeeper:latest'
-    ports:
-      - "2181:2181"
-    container_name: zookeeper
-    volumes:
-      - /etc/localtime:/etc/localtime
-      - ./components/zookeeper/data:/var/lib/zookeeper/data
-      - ./components/zookeeper/log:/var/lib/zookeeper/log
-    environment:
-      TZ: Asia/Shanghai
-      ALLOW_ANONYMOUS_LOGIN: "yes"
-      ZOO_PORT_NUMBER: 2181
-    restart: always
-    networks:
-      easy-chat:
-
-  kafka:
-    image: 'bitnami/kafka:3.3.2'
+#  zookeeper:
+#    image: 'bitnami/zookeeper:latest'
+#    ports:
+#      - "2181:2181"
+#    container_name: zookeeper
+#    volumes:
+#      - /etc/localtime:/etc/localtime
+#      - ./components/zookeeper/data:/var/lib/zookeeper/data
+#      - ./components/zookeeper/log:/var/lib/zookeeper/log
+#    environment:
+#      TZ: Asia/Shanghai
+#      ALLOW_ANONYMOUS_LOGIN: "yes"
+#      ZOO_PORT_NUMBER: 2181
 #    restart: always
-    container_name: kafka
-    ports:
-      - "9092:9092"
-    environment:
-      TZ: Asia/Shanghai
-      KAFKA_BROKER_ID: 0
-      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
-      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://192.168.1.102:9092
-      KAFKA_CFG_ZOOKEEPER_CONNECT: 192.168.1.102:2181
-      ALLOW_PLAINTEXT_LISTENER: "yes"
-    volumes:
-      - ./components/kafka/data:/bitnami/kafka/data
-#      - ./components/kafka/config:/opt/bitnami/kafka/config 打开后kafka异常，无法启动
-      - ./components/kafka/logs:/opt/bitnami/kafka/logs
-    depends_on:
-      - zookeeper
-    networks:
-      easy-chat:
+#    networks:
+#      easy-chat:
+#
+#  kafka:
+#    image: 'bitnami/kafka:3.3.2'
+##    restart: always
+#    container_name: kafka
+#    ports:
+#      - "9092:9092"
+#    environment:
+#      TZ: Asia/Shanghai
+#      KAFKA_BROKER_ID: 0
+#      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+#      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://192.168.1.102:9092
+#      KAFKA_CFG_ZOOKEEPER_CONNECT: 192.168.1.102:2181
+#      ALLOW_PLAINTEXT_LISTENER: "yes"
+#    volumes:
+#      - ./components/kafka/data:/bitnami/kafka/data
+##      - ./components/kafka/config:/opt/bitnami/kafka/config 打开后kafka异常，无法启动
+#      - ./components/kafka/logs:/opt/bitnami/kafka/logs
+#    depends_on:
+#      - zookeeper
+#    networks:
+#      easy-chat:
 
 #  mysql:
 #    image: mysql:8.3.0

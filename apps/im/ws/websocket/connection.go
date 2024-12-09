@@ -29,6 +29,7 @@ type Conn struct {
 	done chan struct{}
 }
 
+// NewConn 通过http的方式获取连接对象
 func NewConn(s *Server, w http.ResponseWriter, r *http.Request) *Conn {
 	c, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {

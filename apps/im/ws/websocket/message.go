@@ -12,7 +12,7 @@ const (
 	FrameErr   FrameType = 0x9
 )
 
-// msg,id,seq
+// Message msg,id,seq
 type Message struct {
 	FrameType `json:"frameType"`
 	Id        string      `json:"id"`

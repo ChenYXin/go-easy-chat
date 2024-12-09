@@ -5,10 +5,10 @@ JwtAuth:
   AccessSecret: Donkor.Easy.Chat
 
 Mongo:
-  Url: "mongodb://root:easy-chat@192.168.1.102:27017"
+  Url: "mongodb://root:easy-chat@192.168.1.103:27017"
   Db: easy-chat
 
 MsgChatTransfer:
   Topic: MsgChatTransfer
   Addrs:
-    - 192.168.1.102:9092
+    - 192.168.1.103:9092
