@@ -4,19 +4,19 @@ ListenOn: 0.0.0.0:10091
 MsgChatTransfer:
   Name: MsgChatTransfer
   Brokers:
-    - 192.168.1.102:9092
+    - 192.168.1.103:9092
   Group: kafka
   Topic: msgChatTransfer
   Offset: first
   Consumers: 1
 
 Redisx:
-  Host: 192.168.1.102:6379
+  Host: 192.168.1.103:6379
   Type: node
   Pss:
 
 Mongo:
-  Url: "mongodb://root:easy-chat@192.168.1.102:27017"
+  Url: "mongodb://root:easy-chat@192.168.1.103:27017"
   Db: easy-chat
 
 Ws:

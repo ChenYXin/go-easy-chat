@@ -32,6 +32,7 @@ func GenUid(dsn string) string {
 	return fmt.Sprintf("%#016x", w.Next())
 }
 
+// CombinedId 组合id的方法，用于单聊
 func CombinedId(aid, bid string) string {
 	ids := []string{aid, bid}
 

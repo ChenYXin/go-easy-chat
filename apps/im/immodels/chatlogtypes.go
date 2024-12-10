@@ -14,8 +14,8 @@ type ChatLog struct {
 	SendId         string             `bson:"sendId"`
 	RecvId         string             `bson:"recvId"`
 	MsgFrom        int                `bson:"msgFrom"`
-	ChatType       constants.ChatType `bson:"chatType"`
-	MsgType        constants.Mtype    `bson:"msgType"`
+	ChatType       constants.ChatType `bson:"chatType"` //SingleChatType：单聊、GroupChatType：群聊
+	MsgType        constants.Mtype    `bson:"msgType"`  //文字
 	MsgContent     string             `bson:"msgContent"`
 	SendTime       int64              `bson:"sendTime"`
 	Status         int                `bson:"status"`

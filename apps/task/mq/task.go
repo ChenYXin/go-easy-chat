@@ -25,8 +25,10 @@ func main() {
 	ctx := svc.NewServiceContext(c)
 
 	listen := handler.NewListen(ctx)
+	//服务组
 	serviceGroup := service.NewServiceGroup()
 
+	//服务组统一管理服务对象
 	for _, s := range listen.Services() {
 		serviceGroup.Add(s)
 	}

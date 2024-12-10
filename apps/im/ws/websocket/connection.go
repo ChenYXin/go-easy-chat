@@ -10,15 +10,15 @@ import (
 )
 
 type Conn struct {
-	idleMu sync.Mutex
+	idleMu sync.Mutex //空闲操作锁
 
 	Uid string
 
 	*websocket.Conn
 	s *Server
 
-	idle              time.Time
-	maxConnectionIdle time.Duration
+	idle              time.Time     //空闲时间
+	maxConnectionIdle time.Duration //最大空闲时间
 
 	messageMu      sync.Mutex
 	readMessage    []*Message
@@ -38,16 +38,16 @@ func NewConn(s *Server, w http.ResponseWriter, r *http.Request) *Conn {
 	}
 
 	conn := &Conn{
-		Conn:              c,
-		s:                 s,
-		idle:              time.Now(),
-		maxConnectionIdle: s.opt.maxConnectIdle,
+		Conn:              c,                    //连接对象
+		s:                 s,                    //服务
+		idle:              time.Now(),           //空闲时间
+		maxConnectionIdle: s.opt.maxConnectIdle, //最大空闲时间
 
 		readMessage:    make([]*Message, 0, 2),
 		readMessageSeq: make(map[string]*Message, 2),
 		message:        make(chan *Message, 1),
 
-		done: make(chan struct{}),
+		done: make(chan struct{}), //结束服务的通道
 	}
 
 	// 执行心跳检测
@@ -86,6 +86,7 @@ func (c *Conn) appendMsgMq(msg *Message) {
 
 }
 
+// ReadMessage 连接对象读操作
 func (c *Conn) ReadMessage() (messageType int, data []byte, err error) {
 	messageType, data, err = c.Conn.ReadMessage()
 
@@ -96,6 +97,7 @@ func (c *Conn) ReadMessage() (messageType int, data []byte, err error) {
 	return
 }
 
+// WriteMessage 连接对象写操作
 func (c *Conn) WriteMessage(messageType int, data []byte) error {
 	c.idleMu.Lock()
 	defer c.idleMu.Unlock()

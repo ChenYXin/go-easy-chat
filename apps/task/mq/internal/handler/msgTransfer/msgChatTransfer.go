@@ -24,7 +24,7 @@ func NewMsgChatTransfer(svc *svc.ServiceContext) *MsgChatTransfer {
 	}
 }
 
-// 实现消费消息的接口
+// Consume 实现消费消息的接口,go-zero提供的queue
 func (m *MsgChatTransfer) Consume(ctx context.Context, key, value string) error {
 	fmt.Println("key：", key, " value：", value)
 

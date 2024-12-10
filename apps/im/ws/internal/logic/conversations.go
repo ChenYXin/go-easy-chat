@@ -25,6 +25,7 @@ func NewConversation(ctx context.Context, srv *websocket.Server, svc *svc.Servic
 }
 
 func (l *Conversation) SingleChat(data *ws.Chat, userId string) error {
+	//生成一个新的会话
 	if data.ConversationId == "" {
 		data.ConversationId = wuid.CombinedId(userId, data.RecvId)
 	}
