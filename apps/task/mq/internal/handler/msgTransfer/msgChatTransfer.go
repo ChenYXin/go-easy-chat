@@ -34,11 +34,13 @@ func (m *MsgChatTransfer) Consume(ctx context.Context, key, value string) error 
 	)
 
 	if err := json.Unmarshal([]byte(value), &data); err != nil {
+		fmt.Println("消息队列中消息转换错误", err)
 		return err
 	}
 
 	//记录消息，存储到mangodb
 	if err := m.addChatLog(ctx, &data); err != nil {
+		fmt.Println("记录消息，存储到mangodb发生错误:", err)
 		return err
 	}
 

@@ -2,18 +2,18 @@ Name: user.rpc
 ListenOn: 0.0.0.0:10000
 Etcd:
   Hosts:
-  - 192.168.1.102:2379
+  - 192.168.1.103:2379
   Key: user.rpc
 Mysql:
   DataSource: root:a12Cd3_45pUq6@tcp(127.0.0.1:3306)/easy-chat?charset=utf8mb4&parseT
 
 Redisx:
-  Host: 192.168.1.102:6379
+  Host: 192.168.1.103:6379
   Type: node
   Pss:
 
 Cache:
-  - Host: 192.168.1.102:6379
+  - Host: 192.168.1.103:6379
     Type: node
     Pss:
 

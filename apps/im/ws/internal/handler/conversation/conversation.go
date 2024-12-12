@@ -19,7 +19,9 @@ func Chat(svc *svc.ServiceContext) websocket.HandlerFunc {
 			srv.Send(websocket.NewErrMessage(err), conn)
 			return
 		}
+		fmt.Println("消息内容：", data)
 
+		fmt.Println("发送消息的类型1:群聊天，2:单聊 --- ", data.ChatType)
 		switch data.ChatType {
 		case constants.SingleChatType:
 			//将消息推送给kafka
@@ -32,8 +34,10 @@ func Chat(svc *svc.ServiceContext) websocket.HandlerFunc {
 				Mtype:          data.Msg.Mtype,
 				Content:        data.Msg.Content,
 			})
+
 			if err != nil {
-				srv.Send(websocket.NewErrMessage(err), conn)
+				fmt.Println("ws发送消息给kafka发生错误", err.Error())
+				err = srv.Send(websocket.NewErrMessage(err), conn)
 				return
 			}
 
