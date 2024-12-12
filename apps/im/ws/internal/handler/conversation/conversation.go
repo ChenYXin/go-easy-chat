@@ -22,7 +22,7 @@ func Chat(svc *svc.ServiceContext) websocket.HandlerFunc {
 
 		switch data.ChatType {
 		case constants.SingleChatType:
-
+			//将消息推送给kafka
 			err := svc.MsgChatTransferClient.Push(&mq.MsgChatTransfer{
 				ConversationId: data.ConversationId,
 				ChatType:       data.ChatType,

@@ -2,6 +2,7 @@ package mq
 
 import "easy-chat/pkg/constants"
 
+// MsgChatTransfer 消息转化的格式，用于消息队列
 type MsgChatTransfer struct {
 	ConversationId     string `json:"conversationId"`
 	constants.ChatType `json:"chatType"`

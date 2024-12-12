@@ -25,6 +25,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	}
 }
 
+// SetRootToken 用于websocket里面的鉴权
 func (svc *ServiceContext) SetRootToken() error {
 	//生成jwt
 	systemToken, err := ctxdata.GetJwtToken(svc.Config.Jwt.AccessSecret, time.Now().Unix(),

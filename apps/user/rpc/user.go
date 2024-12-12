@@ -26,6 +26,7 @@ func main() {
 	conf.MustLoad(*configFile, &c)
 	ctx := svc.NewServiceContext(c)
 
+	//在启动的时候创建超级token，用于websocket
 	if err := ctx.SetRootToken(); err != nil {
 		panic(err)
 	}

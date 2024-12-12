@@ -37,7 +37,7 @@ func (m *MsgChatTransfer) Consume(ctx context.Context, key, value string) error 
 		return err
 	}
 
-	//记录数据
+	//记录消息，存储到mangodb
 	if err := m.addChatLog(ctx, &data); err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ func (m *MsgChatTransfer) Consume(ctx context.Context, key, value string) error 
 }
 
 func (m *MsgChatTransfer) addChatLog(ctx context.Context, data *mq.MsgChatTransfer) error {
-	//记录消息
+	//记录消息，存储到mangodb
 	chatLog := immodels.ChatLog{
 		ConversationId: data.ConversationId,
 		SendId:         data.SendId,
