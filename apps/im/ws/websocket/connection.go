@@ -21,10 +21,10 @@ type Conn struct {
 	maxConnectionIdle time.Duration //最大空闲时间
 
 	messageMu      sync.Mutex
-	readMessage    []*Message
-	readMessageSeq map[string]*Message
+	readMessage    []*Message          //读消息的队列，用于ack机制
+	readMessageSeq map[string]*Message //消息的序列化
 
-	message chan *Message
+	message chan *Message //通道，ack确认之后将消息发送给任务处理
 
 	done chan struct{}
 }
@@ -43,9 +43,9 @@ func NewConn(s *Server, w http.ResponseWriter, r *http.Request) *Conn {
 		idle:              time.Now(),           //空闲时间
 		maxConnectionIdle: s.opt.maxConnectIdle, //最大空闲时间
 
-		readMessage:    make([]*Message, 0, 2),
-		readMessageSeq: make(map[string]*Message, 2),
-		message:        make(chan *Message, 1),
+		readMessage:    make([]*Message, 0, 2),       //队列
+		readMessageSeq: make(map[string]*Message, 2), //消息队列的序列化
+		message:        make(chan *Message, 1),       //消息的通道
 
 		done: make(chan struct{}), //结束服务的通道
 	}
@@ -56,6 +56,7 @@ func NewConn(s *Server, w http.ResponseWriter, r *http.Request) *Conn {
 	return conn
 }
 
+// 读取队列，发送消息
 func (c *Conn) appendMsgMq(msg *Message) {
 	c.messageMu.Lock()
 	defer c.messageMu.Unlock()
@@ -81,6 +82,7 @@ func (c *Conn) appendMsgMq(msg *Message) {
 		return
 	}
 
+	//记录好消息，消息的序列号
 	c.readMessage = append(c.readMessage, msg)
 	c.readMessageSeq[msg.Id] = msg
 

@@ -203,7 +203,7 @@ func (s *Server) handlerConn(conn *Conn) {
 	uids := s.GetUsers(conn)
 	conn.Uid = uids[0]
 
-	//处理任务
+	//ACK 处理任务
 	go s.handlerWrite(conn)
 
 	if s.isAck(nil) {
@@ -334,7 +334,7 @@ func (s *Server) readAck(conn *Conn) {
 	}
 }
 
-// 任务的处理
+// ACK 任务的处理
 func (s *Server) handlerWrite(conn *Conn) {
 	for {
 		select {
