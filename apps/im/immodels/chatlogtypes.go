@@ -7,6 +7,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// 一次性能读多少消息，最大的
+var DefaultChatLogLimit int64 = 100
+
 type ChatLog struct {
 	ID primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 
@@ -19,6 +22,7 @@ type ChatLog struct {
 	MsgContent     string             `bson:"msgContent"`
 	SendTime       int64              `bson:"sendTime"`
 	Status         int                `bson:"status"`
+	ReadRecords    []byte             `bson:"readRecords"` // 已读未读
 
 	//Todo : Fill your own fields
 	UpdateAt time.Time `bson:"updateAt,omitempty" json:"updateAt,omitempty"`

@@ -3,6 +3,7 @@ package immodels
 
 import (
 	"context"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 
 	"github.com/zeromicro/go-zero/core/stores/mon"
@@ -16,6 +17,10 @@ type chatLogModel interface {
 	FindOne(ctx context.Context, id string) (*ChatLog, error)
 	Update(ctx context.Context, data *ChatLog) (*mongo.UpdateResult, error)
 	Delete(ctx context.Context, id string) (int64, error)
+	ListBySendTime(ctx context.Context, conversationId string, startSendTime,
+		endSendTime, limit int64) ([]*ChatLog, error)
+	ListByMsgIds(ctx context.Context, msgIds []string) ([]*ChatLog, error)
+	UpdateMarkRead(ctx context.Context, id primitive.ObjectID, readRecords []byte) error
 }
 
 type defaultChatLogModel struct {
@@ -71,4 +76,79 @@ func (m *defaultChatLogModel) Delete(ctx context.Context, id string) (int64, err
 
 	res, err := m.conn.DeleteOne(ctx, bson.M{"_id": oid})
 	return res, err
+}
+
+func (m *defaultChatLogModel) ListBySendTime(ctx context.Context, conversationId string, startSendTime,
+	endSendTime, limit int64) ([]*ChatLog, error) {
+	var data []*ChatLog
+
+	// mongo db的查找选项
+	opt := options.FindOptions{
+		Limit: &DefaultChatLogLimit,
+		Sort: bson.M{ // 按照发送时间逆序（就是最近的到最远的）
+			"sendTime": -1,
+		},
+	}
+
+	if limit > 0 {
+		opt.Limit = &limit // 自定义limit
+	}
+
+	filter := bson.M{
+		"conversationId": conversationId, // 设置查找条件，根据会话ID查
+	}
+	if endSendTime > 0 {
+		filter["sendTime"] = bson.M{ // 设置时间范围查找
+			"$gt":  endSendTime,
+			"$lte": startSendTime,
+		}
+	} else {
+		filter["sendTime"] = bson.M{
+			"$lt": startSendTime,
+		}
+	}
+
+	err := m.conn.Find(ctx, &data, filter, &opt)
+	switch err {
+	case nil:
+		return data, nil
+	case mon.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
+func (m *defaultChatLogModel) ListByMsgIds(ctx context.Context, msgIds []string) ([]*ChatLog, error) {
+	var data []*ChatLog
+
+	ids := make([]primitive.ObjectID, 0, len(msgIds))
+	for _, id := range msgIds {
+		oid, _ := primitive.ObjectIDFromHex(id)
+		ids = append(ids, oid)
+	}
+
+	filter := bson.M{
+		"_id": bson.M{
+			"$in": ids, // $in是查询字段
+		},
+	}
+
+	err := m.conn.Find(ctx, &data, filter)
+	switch err {
+	case nil:
+		return data, nil
+	case mon.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
+func (m *defaultChatLogModel) UpdateMarkRead(ctx context.Context, id primitive.ObjectID, readRecords []byte) error {
+
+	_, err := m.conn.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": bson.M{
+		"readRecords": readRecords,
+	}})
+	return err
 }
